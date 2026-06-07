@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import AppHeader from '../components/AppHeader'
 import CalendarBoard from '../components/CalendarBoard'
+import DayPreviewModal from '../components/DayPreviewModal'
 import EventModal from '../components/EventModal'
 import FilterBar from '../components/FilterBar'
 import { useEvents } from '../hooks/useEvents'
@@ -10,6 +11,7 @@ export default function AdminPage() {
   const [typeFilter, setTypeFilter] = useState('All')
   const [statusFilter, setStatusFilter] = useState('All')
   const [editing, setEditing] = useState(null)
+  const [previewDate, setPreviewDate] = useState('')
   const [defaultDate, setDefaultDate] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -21,8 +23,13 @@ export default function AdminPage() {
   const openNew = (date = '') => {
     setEditing(null)
     setDefaultDate(date)
+    setPreviewDate('')
     setModalOpen(true)
   }
+
+  const previewEvents = useMemo(() => filteredEvents
+    .filter((event) => event.start_date === previewDate)
+    .sort((a, b) => (a.start_time || '').localeCompare(b.start_time || '')), [filteredEvents, previewDate])
 
   return (
     <main className="admin-page">
@@ -36,8 +43,17 @@ export default function AdminPage() {
         <CalendarBoard
           events={filteredEvents}
           initialView="dayGridMonth"
-          onDateClick={openNew}
-          onEventClick={(event) => { setEditing(event); setModalOpen(true) }}
+          onDateClick={setPreviewDate}
+          onEventClick={(event) => { setEditing(event); setPreviewDate(''); setModalOpen(true) }}
+        />
+      )}
+      {previewDate && (
+        <DayPreviewModal
+          date={previewDate}
+          events={previewEvents}
+          onClose={() => setPreviewDate('')}
+          onAddEvent={openNew}
+          onEditEvent={(event) => { setEditing(event); setPreviewDate(''); setModalOpen(true) }}
         />
       )}
       {modalOpen && <EventModal event={editing} defaultDate={defaultDate} onClose={() => setModalOpen(false)} onSave={saveEvent} onDelete={deleteEvent} />}
