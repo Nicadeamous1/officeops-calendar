@@ -42,7 +42,7 @@ export default function DisplayPage() {
           initialView="timeGridWeek"
           height="calc(100vh - 275px)"
           onDateClick={setPreviewDate}
-          onEventClick={(event) => setPreviewDate(event.start_date)}
+          onEventClick={(event, clickedDate) => setPreviewDate(clickedDate || event.start_date)}
         />
       )}
       <footer className="summary-footer">

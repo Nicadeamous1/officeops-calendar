@@ -17,8 +17,14 @@ export default function CalendarBoard({ events, initialView, onEventClick, onDat
         }}
         buttonText={{ today: 'Today', week: 'Week', month: 'Month' }}
         events={events.map(toCalendarEvent)}
-        eventClick={(info) => onEventClick?.(info.event.extendedProps)}
+        eventClick={(info) => {
+          info.jsEvent.preventDefault()
+          info.jsEvent.stopPropagation()
+          onEventClick?.(info.event.extendedProps, info.event.startStr.slice(0, 10))
+        }}
         dateClick={(info) => onDateClick?.(info.dateStr.slice(0, 10))}
+        navLinks
+        navLinkDayClick={(date) => onDateClick?.(date.toLocaleDateString('en-CA'))}
         nowIndicator
         height={height}
         eventTimeFormat={{ hour: 'numeric', minute: '2-digit', meridiem: 'short' }}

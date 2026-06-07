@@ -43,6 +43,7 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .fc .fc-button-primary:not(:disabled).fc-button-active, .fc .fc-button-primary:not(:disabled):active { background: var(--accent-dark); border-color: var(--accent); }
 .fc .fc-toolbar-title { font-size: 1.25rem; }
 .fc .fc-col-header-cell-cushion, .fc .fc-daygrid-day-number { color: #ffe3f2; }
+.fc .fc-col-header-cell-cushion, .fc .fc-daygrid-day-number, .fc-event, .fc-timegrid-slot { cursor: pointer; }
 .fc-event { padding: 2px 4px; border-radius: 5px; font-weight: 750; cursor: pointer; }
 
 .display-page { display: flex; flex-direction: column; padding: 16px 24px; }

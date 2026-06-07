@@ -51,7 +51,7 @@ export default function AdminPage() {
           events={filteredEvents}
           initialView="dayGridMonth"
           onDateClick={setPreviewDate}
-          onEventClick={(event) => setPreviewDate(event.start_date)}
+          onEventClick={(event, clickedDate) => setPreviewDate(clickedDate || event.start_date)}
         />
       )}
       {previewDate && (
