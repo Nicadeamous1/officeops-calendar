@@ -82,6 +82,11 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .event-time { color: var(--accent) !important; font-weight: 850; text-transform: uppercase; letter-spacing: .05em; }
 .event-notes { color: #fff1f8 !important; }
 .empty-day-card { border: 1px dashed var(--line); border-radius: 12px; padding: 24px; text-align: center; background: rgba(255, 119, 189, .06); }
+.event-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 16px; margin: 12px 0; }
+.event-detail-grid div { border-radius: 7px; padding: 8px; background: rgba(255, 119, 189, .1); }
+.event-detail-grid .wide { grid-column: 1 / -1; }
+.event-detail-grid dt { color: var(--muted); font-size: .7rem; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
+.event-detail-grid dd { margin: 3px 0 0; color: #fff; font-weight: 700; white-space: pre-wrap; }
 .week-preview-modal { max-width: 980px; }
 .print-header { border-bottom: 2px solid var(--line); margin-bottom: 14px; padding-bottom: 12px; }
 .print-header p, .print-header span { color: var(--muted); font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: .08em; }
@@ -107,6 +112,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   .header-actions { flex-wrap: wrap; }
   .form-grid { grid-template-columns: 1fr; }
   .form-grid .wide, .checkbox-group { grid-column: auto; }
+  .event-detail-grid { grid-template-columns: 1fr; }
+  .event-detail-grid .wide { grid-column: auto; }
   .summary-footer { grid-template-columns: 1fr 1fr; }
   .display-page .fc { font-size: .75rem; }
 }

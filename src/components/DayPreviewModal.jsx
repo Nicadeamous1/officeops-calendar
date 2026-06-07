@@ -33,6 +33,7 @@ export default function DayPreviewModal({ date, events, onClose, onAddEvent, onE
                   <h3>{event.title}</h3>
                   <p>{event.type} • {event.status || 'Scheduled'}</p>
                   {event.assigned_manager && <p>Manager: {event.assigned_manager}</p>}
+                  <EventDetails event={event} />
                   {event.notes && <p className="event-notes">{event.notes}</p>}
                 </div>
                 {!readOnly && <button type="button" className="button secondary" onClick={() => onEditEvent(event)}>Edit</button>}
@@ -50,6 +51,67 @@ export default function DayPreviewModal({ date, events, onClose, onAddEvent, onE
       </section>
     </div>
   )
+}
+
+function EventDetails({ event }) {
+  const extra = event.extra_data || {}
+
+  if (event.type === 'VIP Replacement') {
+    return (
+      <dl className="event-detail-grid">
+        <Detail label="Guest Name" value={extra.guestName} />
+        <Detail label="Contact Info" value={extra.contactInfo} />
+        <Detail label="Original Issue" value={extra.originalIssue} wide />
+        <Detail label="Replacement Item" value={extra.replacementItem} wide />
+        <Detail label="Due Date" value={formatDate(event.start_date)} />
+        <Detail label="VIP Status" value={extra.vipStatus || event.status} />
+      </dl>
+    )
+  }
+
+  if (event.type === 'Orientation') {
+    return (
+      <dl className="event-detail-grid">
+        <Detail label="Employee" value={extra.employeeName} />
+        <Detail label="Position" value={extra.position} />
+        <Detail label="Trainer" value={extra.trainer} />
+        <Detail label="Phone" value={extra.phone} />
+      </dl>
+    )
+  }
+
+  if (event.type === 'Truck Order') {
+    return (
+      <dl className="event-detail-grid">
+        <Detail label="Vendor" value={extra.vendor} />
+        <Detail label="Delivery Window" value={extra.deliveryWindow} />
+        <Detail label="Order Placed" value={yesNo(extra.orderPlaced)} />
+        <Detail label="Invoice Checked" value={yesNo(extra.invoiceChecked)} />
+        <Detail label="Truck Put Away" value={yesNo(extra.truckPutAway)} />
+        <Detail label="Truck Status" value={extra.truckStatus || event.status} />
+      </dl>
+    )
+  }
+
+  return null
+}
+
+function Detail({ label, value, wide = false }) {
+  if (!value) return null
+  return <div className={wide ? 'wide' : ''}><dt>{label}</dt><dd>{value}</dd></div>
+}
+
+function yesNo(value) {
+  return value ? 'Yes' : 'No'
+}
+
+function formatDate(date) {
+  if (!date) return ''
+  return new Date(`${date}T12:00:00`).toLocaleDateString([], {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  })
 }
 
 function formatTime(time) {
