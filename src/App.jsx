@@ -16,9 +16,6 @@ export default function App() {
       return undefined
     }
     let active = true
-    const fallback = window.setTimeout(() => {
-      if (active) setCheckingSession(false)
-    }, 4000)
 
     supabase.auth.getSession()
       .then(({ data }) => {
@@ -34,12 +31,12 @@ export default function App() {
     const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
       if (!active) return
       setSession(nextSession)
-      setCheckingSession(false)
     })
+
+    setCheckingSession(false)
 
     return () => {
       active = false
-      window.clearTimeout(fallback)
       data.subscription.unsubscribe()
     }
   }, [])
