@@ -6,38 +6,6 @@ import './styles.css'
 
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '') || '/'
 
-window.addEventListener('error', (event) => showBootError(event.error || event.message))
-window.addEventListener('unhandledrejection', (event) => showBootError(event.reason))
-
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <React.StrictMode>
-    <ErrorBoundary>
-      <BrowserRouter basename={basename}>
-        <App />
-      </BrowserRouter>
-    </ErrorBoundary>
-  </React.StrictMode>,
-)
-
-function showBootError(error) {
-  window.setTimeout(() => {
-    const root = document.getElementById('root')
-    if (!root || root.children.length > 0) return
-    const message = error?.message || String(error || 'Unknown startup error')
-    root.innerHTML = `<main class="landing-page"><section class="landing-card"><p class="eyebrow">OfficeOps could not load</p><h1>Startup error</h1><p>${escapeHtml(message)}</p><button class="button primary" onclick="location.href='/officeops-calendar/'">Return Home</button></section></main>`
-  }, 0)
-}
-
-function escapeHtml(value) {
-  return value.replace(/[&<>"']/g, (character) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;',
-  })[character])
-}
-
 class ErrorBoundary extends Component {
   constructor(props) {
     super(props)
@@ -66,3 +34,35 @@ class ErrorBoundary extends Component {
     return this.props.children
   }
 }
+
+function showBootError(error) {
+  window.setTimeout(() => {
+    const root = document.getElementById('root')
+    if (!root || root.children.length > 0) return
+    const message = error?.message || String(error || 'Unknown startup error')
+    root.innerHTML = `<main class="landing-page"><section class="landing-card"><p class="eyebrow">OfficeOps could not load</p><h1>Startup error</h1><p>${escapeHtml(message)}</p><button class="button primary" onclick="location.href='/officeops-calendar/'">Return Home</button></section></main>`
+  }, 0)
+}
+
+function escapeHtml(value) {
+  return value.replace(/[&<>"']/g, (character) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;',
+  })[character])
+}
+
+window.addEventListener('error', (event) => showBootError(event.error || event.message))
+window.addEventListener('unhandledrejection', (event) => showBootError(event.reason))
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <ErrorBoundary>
+      <BrowserRouter basename={basename}>
+        <App />
+      </BrowserRouter>
+    </ErrorBoundary>
+  </React.StrictMode>,
+)
