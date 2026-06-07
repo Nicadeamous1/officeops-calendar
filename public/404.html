@@ -2,18 +2,16 @@
 <html>
   <head>
     <meta charset="utf-8" />
+    <meta name="theme-color" content="#09111f" />
     <title>OfficeOps Calendar</title>
     <script>
-      const pathSegmentsToKeep = 1
-      const location = window.location
-      location.replace(
-        location.protocol + '//' + location.hostname + (location.port ? ':' + location.port : '') +
-        location.pathname.split('/').slice(0, 1 + pathSegmentsToKeep).join('/') + '/?/' +
-        location.pathname.slice(1).split('/').slice(pathSegmentsToKeep).join('/').replace(/&/g, '~and~') +
-        (location.search ? '&' + location.search.slice(1).replace(/&/g, '~and~') : '') +
-        location.hash
-      )
+      const base = '/officeops-calendar/'
+      const route = window.location.pathname.slice(base.length - 1)
+      window.location.replace(base + '?route=' + encodeURIComponent(route || '/') + window.location.hash)
     </script>
+    <style>
+      body { margin: 0; background: #09111f; color: #e6edf7; font-family: system-ui, sans-serif; }
+    </style>
   </head>
-  <body></body>
+  <body>Loading OfficeOps...</body>
 </html>
