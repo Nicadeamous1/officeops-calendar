@@ -17,6 +17,9 @@ create table if not exists public.events (
 
 alter table public.events enable row level security;
 
+grant usage on schema public to authenticated;
+grant select, insert, update, delete on table public.events to authenticated;
+
 create policy "Authenticated users can view events"
 on public.events for select
 to authenticated
