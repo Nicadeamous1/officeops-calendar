@@ -1,6 +1,6 @@
 import { colorForEvent } from '../lib/events'
 
-export default function DayPreviewModal({ date, events, onClose, onAddEvent, onEditEvent, readOnly = false }) {
+export default function DayPreviewModal({ date, events, onClose, onAddEvent, onEditEvent, onPrintWeek, readOnly = false }) {
   const dateLabel = new Date(`${date}T12:00:00`).toLocaleDateString([], {
     weekday: 'long',
     month: 'long',
@@ -44,6 +44,7 @@ export default function DayPreviewModal({ date, events, onClose, onAddEvent, onE
         <div className="modal-actions">
           <span />
           <button type="button" className="button secondary" onClick={onClose}>Close</button>
+          {onPrintWeek && <button type="button" className="button secondary" onClick={() => onPrintWeek(date)}>Print Week</button>}
           {!readOnly && <button type="button" className="button primary" onClick={() => onAddEvent(date)}>+ Add Event</button>}
         </div>
       </section>

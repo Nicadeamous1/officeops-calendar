@@ -51,14 +51,30 @@ export function todayIso() {
 
 export function startOfWeekIso() {
   const date = new Date()
+  return startOfWeekForDateIso(date)
+}
+
+export function endOfWeekIso() {
+  const date = new Date()
+  return endOfWeekForDateIso(date)
+}
+
+export function startOfWeekForDateIso(value) {
+  const date = typeof value === 'string' ? new Date(`${value}T12:00:00`) : new Date(value)
   date.setHours(0, 0, 0, 0)
   date.setDate(date.getDate() - date.getDay())
   return date.toLocaleDateString('en-CA')
 }
 
-export function endOfWeekIso() {
-  const date = new Date()
+export function endOfWeekForDateIso(value) {
+  const date = typeof value === 'string' ? new Date(`${value}T12:00:00`) : new Date(value)
   date.setHours(0, 0, 0, 0)
   date.setDate(date.getDate() + (6 - date.getDay()))
+  return date.toLocaleDateString('en-CA')
+}
+
+export function addDaysIso(value, days) {
+  const date = typeof value === 'string' ? new Date(`${value}T12:00:00`) : new Date(value)
+  date.setDate(date.getDate() + days)
   return date.toLocaleDateString('en-CA')
 }

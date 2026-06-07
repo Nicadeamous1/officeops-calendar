@@ -4,7 +4,9 @@ import CalendarBoard from '../components/CalendarBoard'
 import DayPreviewModal from '../components/DayPreviewModal'
 import EventModal from '../components/EventModal'
 import FilterBar from '../components/FilterBar'
+import WeekPreviewModal from '../components/WeekPreviewModal'
 import { useEvents } from '../hooks/useEvents'
+import { todayIso } from '../lib/events'
 
 export default function AdminPage() {
   const { events, loading, error, saveEvent, deleteEvent } = useEvents()
@@ -12,6 +14,7 @@ export default function AdminPage() {
   const [statusFilter, setStatusFilter] = useState('All')
   const [editing, setEditing] = useState(null)
   const [previewDate, setPreviewDate] = useState('')
+  const [weekPreviewDate, setWeekPreviewDate] = useState('')
   const [defaultDate, setDefaultDate] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -24,6 +27,7 @@ export default function AdminPage() {
     setEditing(null)
     setDefaultDate(date)
     setPreviewDate('')
+    setWeekPreviewDate('')
     setModalOpen(true)
   }
 
@@ -33,7 +37,10 @@ export default function AdminPage() {
 
   return (
     <main className="admin-page">
-      <AppHeader mode="admin"><button className="button primary" onClick={() => openNew()}>+ Add Event</button></AppHeader>
+      <AppHeader mode="admin">
+        <button className="button secondary" onClick={() => setWeekPreviewDate(previewDate || todayIso())}>Print Week</button>
+        <button className="button primary" onClick={() => openNew()}>+ Add Event</button>
+      </AppHeader>
       <section className="toolbar-card">
         <FilterBar {...{ typeFilter, setTypeFilter, statusFilter, setStatusFilter }} />
         <span className="result-count">{filteredEvents.length} events shown</span>
@@ -53,9 +60,11 @@ export default function AdminPage() {
           events={previewEvents}
           onClose={() => setPreviewDate('')}
           onAddEvent={openNew}
+          onPrintWeek={(date) => { setPreviewDate(''); setWeekPreviewDate(date) }}
           onEditEvent={(event) => { setEditing(event); setPreviewDate(''); setModalOpen(true) }}
         />
       )}
+      {weekPreviewDate && <WeekPreviewModal date={weekPreviewDate} events={filteredEvents} onClose={() => setWeekPreviewDate('')} />}
       {modalOpen && <EventModal event={editing} defaultDate={defaultDate} onClose={() => setModalOpen(false)} onSave={saveEvent} onDelete={deleteEvent} />}
     </main>
   )

@@ -81,6 +81,16 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .event-time { color: var(--accent) !important; font-weight: 850; text-transform: uppercase; letter-spacing: .05em; }
 .event-notes { color: #fff1f8 !important; }
 .empty-day-card { border: 1px dashed var(--line); border-radius: 12px; padding: 24px; text-align: center; background: rgba(255, 119, 189, .06); }
+.week-preview-modal { max-width: 980px; }
+.print-header { border-bottom: 2px solid var(--line); margin-bottom: 14px; padding-bottom: 12px; }
+.print-header p, .print-header span { color: var(--muted); font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: .08em; }
+.print-header h1 { margin: 4px 0; }
+.print-day { break-inside: avoid; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 12px; padding: 12px; background: rgba(255, 119, 189, .06); }
+.print-day h3 { margin: 0 0 10px; color: var(--accent); }
+.print-empty { margin: 0; color: var(--muted); }
+.print-event { break-inside: avoid; border-left: 6px solid var(--accent); border-radius: 8px; margin: 8px 0; padding: 10px 12px; background: rgba(255, 255, 255, .06); }
+.print-event h4, .print-event p { margin: 4px 0; }
+.print-event-topline { display: flex; flex-wrap: wrap; gap: 10px; color: var(--muted); font-size: .85rem; font-weight: 800; text-transform: uppercase; }
 
 .landing-page { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at top, #8d275f, #2d0e25 48%, #140812 78%); }
 .landing-card { width: min(620px, 100%); border: 1px solid var(--line); border-radius: 20px; padding: 38px; background: rgba(17, 28, 46, .95); box-shadow: 0 25px 80px #0008; }
@@ -98,4 +108,16 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
   .form-grid .wide, .checkbox-group { grid-column: auto; }
   .summary-footer { grid-template-columns: 1fr 1fr; }
   .display-page .fc { font-size: .75rem; }
+}
+
+@media print {
+  body { background: #fff !important; color: #111 !important; }
+  body * { visibility: hidden; }
+  .printable-sheet, .printable-sheet * { visibility: visible; }
+  .printable-sheet { position: absolute; inset: 0; width: 100% !important; max-height: none !important; overflow: visible !important; border: 0 !important; box-shadow: none !important; background: #fff !important; color: #111 !important; }
+  .print-backdrop { position: static !important; background: #fff !important; padding: 0 !important; }
+  .no-print { display: none !important; }
+  .print-header, .print-day { border-color: #222 !important; background: #fff !important; }
+  .print-header p, .print-header span, .print-event-topline, .print-empty, .print-day h3 { color: #111 !important; }
+  .print-event { background: #fff !important; border-color: #ddd; }
 }
