@@ -15,12 +15,33 @@ export default function App() {
       setCheckingSession(false)
       return undefined
     }
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session)
+    let active = true
+    const fallback = window.setTimeout(() => {
+      if (active) setCheckingSession(false)
+    }, 4000)
+
+    supabase.auth.getSession()
+      .then(({ data }) => {
+        if (active) setSession(data.session)
+      })
+      .catch(() => {
+        if (active) setSession(null)
+      })
+      .finally(() => {
+        if (active) setCheckingSession(false)
+      })
+
+    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => {
+      if (!active) return
+      setSession(nextSession)
       setCheckingSession(false)
     })
-    const { data } = supabase.auth.onAuthStateChange((_event, nextSession) => setSession(nextSession))
-    return () => data.subscription.unsubscribe()
+
+    return () => {
+      active = false
+      window.clearTimeout(fallback)
+      data.subscription.unsubscribe()
+    }
   }, [])
 
   if (checkingSession) return <div className="center-message">Loading OfficeOps...</div>
