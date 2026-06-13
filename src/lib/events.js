@@ -5,6 +5,8 @@ export const EVENT_TYPES = [
   'Interview',
   'Catering',
   'Maintenance',
+  'Staff Request Off',
+  'Manager Request Off',
 ]
 
 export const TYPE_COLORS = {
@@ -14,6 +16,8 @@ export const TYPE_COLORS = {
   Interview: '#a855f7',
   Catering: '#22c55e',
   Maintenance: '#eab308',
+  'Staff Request Off': '#fb7185',
+  'Manager Request Off': '#f472b6',
   Completed: '#64748b',
 }
 
@@ -24,6 +28,8 @@ export const STATUS_OPTIONS = {
   Interview: ['Scheduled', 'Completed', 'Cancelled'],
   Catering: ['Scheduled', 'Confirmed', 'Completed'],
   Maintenance: ['Scheduled', 'In Progress', 'Waiting on Parts', 'Completed'],
+  'Staff Request Off': ['Requested', 'Approved', 'Denied', 'Cancelled'],
+  'Manager Request Off': ['Requested', 'Approved', 'Denied', 'Cancelled'],
 }
 
 export function colorForEvent(event) {
@@ -34,15 +40,27 @@ export function colorForEvent(event) {
 
 export function toCalendarEvent(event) {
   const time = event.start_time ? `T${event.start_time}` : ''
+  const requestEndDate = event.extra_data?.requestEndDate
   return {
     id: event.id,
     title: event.title,
     start: `${event.start_date}${time}`,
+    end: requestEndDate ? addDaysIso(requestEndDate, 1) : undefined,
     allDay: !event.start_time,
     backgroundColor: colorForEvent(event),
     borderColor: colorForEvent(event),
     extendedProps: event,
   }
+}
+
+export function eventOccursOnDate(event, date) {
+  const endDate = event.extra_data?.requestEndDate || event.start_date
+  return event.start_date <= date && endDate >= date
+}
+
+export function eventOverlapsRange(event, rangeStart, rangeEnd) {
+  const endDate = event.extra_data?.requestEndDate || event.start_date
+  return event.start_date <= rangeEnd && endDate >= rangeStart
 }
 
 export function todayIso() {

@@ -1,11 +1,11 @@
-import { addDaysIso, colorForEvent, endOfWeekForDateIso, startOfWeekForDateIso } from '../lib/events'
+import { addDaysIso, colorForEvent, endOfWeekForDateIso, eventOccursOnDate, eventOverlapsRange, startOfWeekForDateIso } from '../lib/events'
 
 export default function WeekPreviewModal({ date, events, onClose }) {
   const weekStart = startOfWeekForDateIso(date)
   const weekEnd = endOfWeekForDateIso(date)
   const days = Array.from({ length: 7 }, (_item, index) => addDaysIso(weekStart, index))
   const weekEvents = events
-    .filter((event) => event.start_date >= weekStart && event.start_date <= weekEnd)
+    .filter((event) => eventOverlapsRange(event, weekStart, weekEnd))
     .sort((a, b) => a.start_date.localeCompare(b.start_date) || (a.start_time || '').localeCompare(b.start_time || ''))
 
   return (
@@ -26,7 +26,7 @@ export default function WeekPreviewModal({ date, events, onClose }) {
         </div>
 
         {days.map((day) => {
-          const dayEvents = weekEvents.filter((event) => event.start_date === day)
+          const dayEvents = weekEvents.filter((event) => eventOccursOnDate(event, day))
           return (
             <section className="print-day" key={day}>
               <h3>{formatLongDate(day)}</h3>
@@ -72,6 +72,9 @@ function PrintDetails({ event }) {
   }
   if (event.type === 'Maintenance') {
     return <p>{[extra.issue, extra.location, extra.priority && `Priority: ${extra.priority}`, extra.serviceVendor, extra.workOrderNumber && `WO: ${extra.workOrderNumber}`].filter(Boolean).join(' | ')}</p>
+  }
+  if (['Staff Request Off', 'Manager Request Off'].includes(event.type)) {
+    return <p>{[extra.requesterName, extra.position, `${formatLongDate(event.start_date)} - ${formatLongDate(extra.requestEndDate || event.start_date)}`, extra.reason, extra.coverage].filter(Boolean).join(' | ')}</p>
   }
   return null
 }

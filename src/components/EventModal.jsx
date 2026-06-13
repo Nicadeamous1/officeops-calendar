@@ -134,6 +134,20 @@ function TypeFields({ form, setField, setExtra }) {
     <Field label="Work Order Number"><input value={extra.workOrderNumber || ''} onChange={(e) => setExtra('workOrderNumber', e.target.value)} /></Field>
     <Field label="Assigned Manager"><input value={form.assigned_manager || ''} onChange={(e) => setField('assigned_manager', e.target.value)} /></Field>
   </>
+  if (['Staff Request Off', 'Manager Request Off'].includes(form.type)) return <>
+    <Field label={form.type === 'Staff Request Off' ? 'Staff Member Name' : 'Manager Name'}>
+      <input required value={extra.requesterName || ''} onChange={(e) => setExtra('requesterName', e.target.value)} />
+    </Field>
+    <Field label="Position / Role"><input value={extra.position || ''} onChange={(e) => setExtra('position', e.target.value)} /></Field>
+    <Field label="First Day Off"><input required type="date" value={form.start_date} onChange={(e) => {
+      setField('start_date', e.target.value)
+      if (!extra.requestEndDate || extra.requestEndDate < e.target.value) setExtra('requestEndDate', e.target.value)
+    }} /></Field>
+    <Field label="Last Day Off"><input required type="date" min={form.start_date} value={extra.requestEndDate || form.start_date} onChange={(e) => setExtra('requestEndDate', e.target.value)} /></Field>
+    <Field label="Reason" wide><input value={extra.reason || ''} onChange={(e) => setExtra('reason', e.target.value)} /></Field>
+    <Field label="Coverage / Notes" wide><input value={extra.coverage || ''} onChange={(e) => setExtra('coverage', e.target.value)} /></Field>
+    <Field label="Reviewed By"><input value={form.assigned_manager || ''} onChange={(e) => setField('assigned_manager', e.target.value)} /></Field>
+  </>
   return <>
     <Field label="Date"><input required type="date" value={form.start_date} onChange={(e) => setField('start_date', e.target.value)} /></Field>
     <Field label="Start Time"><input type="time" value={form.start_time || ''} onChange={(e) => setField('start_time', e.target.value)} /></Field>
@@ -161,5 +175,7 @@ function makeTitle(form) {
   if (form.type === 'Truck Order') return `Truck: ${form.extra_data.vendor || 'Vendor'}`
   if (form.type === 'VIP Replacement') return `VIP: ${form.extra_data.guestName || 'Guest'}`
   if (form.type === 'Maintenance') return `Maintenance: ${form.extra_data.issue || 'Task'}`
+  if (form.type === 'Staff Request Off') return `Staff Off: ${form.extra_data.requesterName || 'Staff Member'}`
+  if (form.type === 'Manager Request Off') return `Manager Off: ${form.extra_data.requesterName || 'Manager'}`
   return form.type
 }

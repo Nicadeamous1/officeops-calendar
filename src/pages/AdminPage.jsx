@@ -7,7 +7,7 @@ import FilterBar from '../components/FilterBar'
 import OpenVipsModal from '../components/OpenVipsModal'
 import WeekPreviewModal from '../components/WeekPreviewModal'
 import { useEvents } from '../hooks/useEvents'
-import { todayIso } from '../lib/events'
+import { eventOccursOnDate, todayIso } from '../lib/events'
 
 export default function AdminPage() {
   const { events, loading, error, saveEvent, deleteEvent } = useEvents()
@@ -34,7 +34,7 @@ export default function AdminPage() {
   }
 
   const previewEvents = useMemo(() => filteredEvents
-    .filter((event) => event.start_date === previewDate)
+    .filter((event) => eventOccursOnDate(event, previewDate))
     .sort((a, b) => (a.start_time || '').localeCompare(b.start_time || '')), [filteredEvents, previewDate])
 
   return (

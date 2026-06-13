@@ -105,6 +105,19 @@ function EventDetails({ event }) {
     )
   }
 
+  if (['Staff Request Off', 'Manager Request Off'].includes(event.type)) {
+    return (
+      <dl className="event-detail-grid">
+        <Detail label="Name" value={extra.requesterName} />
+        <Detail label="Position / Role" value={extra.position} />
+        <Detail label="First Day Off" value={formatDate(event.start_date)} />
+        <Detail label="Last Day Off" value={formatDate(extra.requestEndDate || event.start_date)} />
+        <Detail label="Reason" value={extra.reason} wide />
+        <Detail label="Coverage / Notes" value={extra.coverage} wide />
+      </dl>
+    )
+  }
+
   return null
 }
 

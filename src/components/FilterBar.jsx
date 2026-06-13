@@ -23,6 +23,10 @@ export default function FilterBar({ typeFilter, setTypeFilter, statusFilter, set
             <option>Completed</option>
             <option>Closed</option>
             <option>Problem</option>
+            <option>Requested</option>
+            <option>Approved</option>
+            <option>Denied</option>
+            <option>Cancelled</option>
           </select>
         </label>
       )}

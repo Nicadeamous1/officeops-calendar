@@ -4,7 +4,7 @@ import CalendarBoard from '../components/CalendarBoard'
 import DayPreviewModal from '../components/DayPreviewModal'
 import FilterBar from '../components/FilterBar'
 import { useEvents } from '../hooks/useEvents'
-import { endOfWeekIso, startOfWeekIso, todayIso } from '../lib/events'
+import { endOfWeekIso, eventOccursOnDate, eventOverlapsRange, startOfWeekIso, todayIso } from '../lib/events'
 
 export default function DisplayPage() {
   const { events, loading, error } = useEvents(30000)
@@ -18,12 +18,12 @@ export default function DisplayPage() {
   }, [])
 
   const filteredEvents = useMemo(() => events.filter((event) => typeFilter === 'All' || (typeFilter === 'Completed' ? ['Completed', 'Closed'].includes(event.status) : event.type === typeFilter)), [events, typeFilter])
-  const weekEvents = events.filter((event) => event.start_date >= startOfWeekIso() && event.start_date <= endOfWeekIso())
+  const weekEvents = events.filter((event) => eventOverlapsRange(event, startOfWeekIso(), endOfWeekIso()))
   const previewEvents = useMemo(() => filteredEvents
-    .filter((event) => event.start_date === previewDate)
+    .filter((event) => eventOccursOnDate(event, previewDate))
     .sort((a, b) => (a.start_time || '').localeCompare(b.start_time || '')), [filteredEvents, previewDate])
   const summaries = [
-    ['Today’s Items', events.filter((event) => event.start_date === todayIso()).length],
+    ['Today’s Items', events.filter((event) => eventOccursOnDate(event, todayIso())).length],
     ['Open VIPs', events.filter((event) => event.type === 'VIP Replacement' && !['Closed', 'Replaced'].includes(event.status)).length],
     ['Orientations This Week', weekEvents.filter((event) => event.type === 'Orientation').length],
     ['Truck Orders This Week', weekEvents.filter((event) => event.type === 'Truck Order').length],
