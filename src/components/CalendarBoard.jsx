@@ -16,6 +16,7 @@ export default function CalendarBoard({ events, initialView, onEventClick, onDat
           right: 'timeGridWeek,dayGridMonth',
         }}
         buttonText={{ today: 'Today', week: 'Week', month: 'Month' }}
+        firstDay={1}
         events={events.map(toCalendarEvent)}
         eventClick={(info) => {
           info.jsEvent.preventDefault()

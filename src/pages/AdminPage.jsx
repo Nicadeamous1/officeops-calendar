@@ -13,6 +13,7 @@ export default function AdminPage() {
   const { events, loading, error, saveEvent, deleteEvent } = useEvents()
   const [typeFilter, setTypeFilter] = useState('All')
   const [statusFilter, setStatusFilter] = useState('All')
+  const [showHolidays, setShowHolidays] = useState(true)
   const [editing, setEditing] = useState(null)
   const [previewDate, setPreviewDate] = useState('')
   const [openVipsVisible, setOpenVipsVisible] = useState(false)
@@ -22,8 +23,8 @@ export default function AdminPage() {
 
   const filteredEvents = useMemo(() => events.filter((event) => {
     const typeMatches = typeFilter === 'All' || (typeFilter === 'Completed' ? ['Completed', 'Closed'].includes(event.status) : event.type === typeFilter)
-    return typeMatches && (statusFilter === 'All' || event.status === statusFilter)
-  }), [events, typeFilter, statusFilter])
+    return typeMatches && (statusFilter === 'All' || event.status === statusFilter) && (showHolidays || event.type !== 'Holiday')
+  }), [events, typeFilter, statusFilter, showHolidays])
 
   const openNew = (date = '') => {
     setEditing(null)
@@ -45,7 +46,7 @@ export default function AdminPage() {
         <button className="button primary" onClick={() => openNew()}>+ Add Event</button>
       </AppHeader>
       <section className="toolbar-card">
-        <FilterBar {...{ typeFilter, setTypeFilter, statusFilter, setStatusFilter }} />
+        <FilterBar {...{ typeFilter, setTypeFilter, statusFilter, setStatusFilter, showHolidays, setShowHolidays }} />
         <span className="result-count">{filteredEvents.length} events shown</span>
       </section>
       {error && <p className="error-message">{error}</p>}

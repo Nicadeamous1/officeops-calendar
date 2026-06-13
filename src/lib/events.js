@@ -7,6 +7,8 @@ export const EVENT_TYPES = [
   'Maintenance',
   'Staff Request Off',
   'Manager Request Off',
+  'Holiday',
+  'Event / Special',
 ]
 
 export const TYPE_COLORS = {
@@ -18,6 +20,8 @@ export const TYPE_COLORS = {
   Maintenance: '#eab308',
   'Staff Request Off': '#fb7185',
   'Manager Request Off': '#f472b6',
+  Holiday: '#06b6d4',
+  'Event / Special': '#84cc16',
   Completed: '#64748b',
 }
 
@@ -30,6 +34,8 @@ export const STATUS_OPTIONS = {
   Maintenance: ['Scheduled', 'In Progress', 'Waiting on Parts', 'Completed'],
   'Staff Request Off': ['Requested', 'Approved', 'Denied', 'Cancelled'],
   'Manager Request Off': ['Requested', 'Approved', 'Denied', 'Cancelled'],
+  Holiday: ['Observed', 'Open', 'Closed'],
+  'Event / Special': ['Planned', 'Confirmed', 'Completed', 'Cancelled'],
 }
 
 export function colorForEvent(event) {
@@ -80,14 +86,16 @@ export function endOfWeekIso() {
 export function startOfWeekForDateIso(value) {
   const date = typeof value === 'string' ? new Date(`${value}T12:00:00`) : new Date(value)
   date.setHours(0, 0, 0, 0)
-  date.setDate(date.getDate() - date.getDay())
+  const daysSinceMonday = (date.getDay() + 6) % 7
+  date.setDate(date.getDate() - daysSinceMonday)
   return date.toLocaleDateString('en-CA')
 }
 
 export function endOfWeekForDateIso(value) {
   const date = typeof value === 'string' ? new Date(`${value}T12:00:00`) : new Date(value)
   date.setHours(0, 0, 0, 0)
-  date.setDate(date.getDate() + (6 - date.getDay()))
+  const daysUntilSunday = (7 - date.getDay()) % 7
+  date.setDate(date.getDate() + daysUntilSunday)
   return date.toLocaleDateString('en-CA')
 }
 

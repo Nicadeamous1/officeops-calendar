@@ -76,6 +76,12 @@ function PrintDetails({ event }) {
   if (['Staff Request Off', 'Manager Request Off'].includes(event.type)) {
     return <p>{[extra.requesterName, extra.position, `${formatLongDate(event.start_date)} - ${formatLongDate(extra.requestEndDate || event.start_date)}`, extra.reason, extra.coverage].filter(Boolean).join(' | ')}</p>
   }
+  if (event.type === 'Holiday') {
+    return <p>{[extra.holidayName, extra.hours].filter(Boolean).join(' | ')}</p>
+  }
+  if (event.type === 'Event / Special') {
+    return <p>{[extra.specialName, extra.promotion, extra.expectedVolume && `Expected: ${extra.expectedVolume}`].filter(Boolean).join(' | ')}</p>
+  }
   return null
 }
 

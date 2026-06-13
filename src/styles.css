@@ -33,6 +33,9 @@ h2 { margin-bottom: 0; }
 
 .toolbar-card, .display-filter { display: flex; justify-content: space-between; align-items: end; margin-bottom: 16px; padding: 12px 15px; border: 1px solid var(--line); border-radius: 12px; background: linear-gradient(135deg, #401531, #2c1227); }
 .filter-bar { display: flex; gap: 12px; }
+.toggle-label { min-width: 105px; }
+.toggle-row { display: flex; align-items: center; gap: 8px; min-height: 38px; color: #fff; font-size: .8rem; }
+.toggle-row input { width: 18px; height: 18px; accent-color: var(--accent-dark); }
 label { display: flex; flex-direction: column; gap: 5px; color: var(--muted); font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; }
 input, select, textarea { width: 100%; border: 1px solid var(--line); border-radius: 7px; padding: 9px 10px; background: #290e21; color: #fff; outline: none; }
 input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(255, 105, 180, .12); }

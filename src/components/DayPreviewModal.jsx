@@ -118,6 +118,20 @@ function EventDetails({ event }) {
     )
   }
 
+  if (event.type === 'Holiday') {
+    return <dl className="event-detail-grid"><Detail label="Holiday" value={extra.holidayName} /><Detail label="Hours / Closure" value={extra.hours} wide /></dl>
+  }
+
+  if (event.type === 'Event / Special') {
+    return (
+      <dl className="event-detail-grid">
+        <Detail label="Event / Special" value={extra.specialName} />
+        <Detail label="Promotion / Offer" value={extra.promotion} wide />
+        <Detail label="Expected Volume" value={extra.expectedVolume} />
+      </dl>
+    )
+  }
+
   return null
 }
 

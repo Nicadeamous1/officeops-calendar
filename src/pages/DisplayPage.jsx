@@ -9,6 +9,7 @@ import { endOfWeekIso, eventOccursOnDate, eventOverlapsRange, startOfWeekIso, to
 export default function DisplayPage() {
   const { events, loading, error } = useEvents(30000)
   const [typeFilter, setTypeFilter] = useState('All')
+  const [showHolidays, setShowHolidays] = useState(true)
   const [previewDate, setPreviewDate] = useState('')
   const [now, setNow] = useState(new Date())
 
@@ -17,7 +18,10 @@ export default function DisplayPage() {
     return () => window.clearInterval(timer)
   }, [])
 
-  const filteredEvents = useMemo(() => events.filter((event) => typeFilter === 'All' || (typeFilter === 'Completed' ? ['Completed', 'Closed'].includes(event.status) : event.type === typeFilter)), [events, typeFilter])
+  const filteredEvents = useMemo(() => events.filter((event) => {
+    const typeMatches = typeFilter === 'All' || (typeFilter === 'Completed' ? ['Completed', 'Closed'].includes(event.status) : event.type === typeFilter)
+    return typeMatches && (showHolidays || event.type !== 'Holiday')
+  }), [events, typeFilter, showHolidays])
   const weekEvents = events.filter((event) => eventOverlapsRange(event, startOfWeekIso(), endOfWeekIso()))
   const previewEvents = useMemo(() => filteredEvents
     .filter((event) => eventOccursOnDate(event, previewDate))
@@ -34,7 +38,7 @@ export default function DisplayPage() {
       <AppHeader mode="display">
         <div className="clock"><strong>{now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</strong><span>{now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}</span></div>
       </AppHeader>
-      <section className="display-filter"><FilterBar typeFilter={typeFilter} setTypeFilter={setTypeFilter} showStatus={false} /></section>
+      <section className="display-filter"><FilterBar typeFilter={typeFilter} setTypeFilter={setTypeFilter} showStatus={false} showHolidays={showHolidays} setShowHolidays={setShowHolidays} /></section>
       {error && <p className="error-message">{error}</p>}
       {loading ? <div className="center-message">Loading operations board...</div> : (
         <CalendarBoard

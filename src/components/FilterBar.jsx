@@ -1,6 +1,6 @@
 import { EVENT_TYPES } from '../lib/events'
 
-export default function FilterBar({ typeFilter, setTypeFilter, statusFilter, setStatusFilter, showStatus = true }) {
+export default function FilterBar({ typeFilter, setTypeFilter, statusFilter, setStatusFilter, showStatus = true, showHolidays, setShowHolidays }) {
   return (
     <div className="filter-bar">
       <label>
@@ -28,6 +28,15 @@ export default function FilterBar({ typeFilter, setTypeFilter, statusFilter, set
             <option>Denied</option>
             <option>Cancelled</option>
           </select>
+        </label>
+      )}
+      {setShowHolidays && (
+        <label className="toggle-label">
+          Holidays
+          <span className="toggle-row">
+            <input type="checkbox" checked={showHolidays} onChange={(event) => setShowHolidays(event.target.checked)} />
+            <span>{showHolidays ? 'Shown' : 'Hidden'}</span>
+          </span>
         </label>
       )}
     </div>

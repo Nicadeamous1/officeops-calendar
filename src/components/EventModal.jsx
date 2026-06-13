@@ -148,6 +148,20 @@ function TypeFields({ form, setField, setExtra }) {
     <Field label="Coverage / Notes" wide><input value={extra.coverage || ''} onChange={(e) => setExtra('coverage', e.target.value)} /></Field>
     <Field label="Reviewed By"><input value={form.assigned_manager || ''} onChange={(e) => setField('assigned_manager', e.target.value)} /></Field>
   </>
+  if (form.type === 'Holiday') return <>
+    <Field label="Holiday Name"><input required value={extra.holidayName || ''} onChange={(e) => setExtra('holidayName', e.target.value)} /></Field>
+    <Field label="Holiday Date"><input required type="date" value={form.start_date} onChange={(e) => setField('start_date', e.target.value)} /></Field>
+    <Field label="Hours / Closure Details" wide><input value={extra.hours || ''} onChange={(e) => setExtra('hours', e.target.value)} placeholder="Closed, normal hours, 10 AM - 6 PM..." /></Field>
+  </>
+  if (form.type === 'Event / Special') return <>
+    <Field label="Event / Special Name"><input required value={extra.specialName || ''} onChange={(e) => setExtra('specialName', e.target.value)} /></Field>
+    <Field label="Date"><input required type="date" value={form.start_date} onChange={(e) => setField('start_date', e.target.value)} /></Field>
+    <Field label="Start Time"><input type="time" value={form.start_time || ''} onChange={(e) => setField('start_time', e.target.value)} /></Field>
+    <Field label="End Time"><input type="time" value={form.end_time || ''} onChange={(e) => setField('end_time', e.target.value)} /></Field>
+    <Field label="Promotion / Offer" wide><input value={extra.promotion || ''} onChange={(e) => setExtra('promotion', e.target.value)} /></Field>
+    <Field label="Expected Volume"><input value={extra.expectedVolume || ''} onChange={(e) => setExtra('expectedVolume', e.target.value)} placeholder="Low, high, 150 guests..." /></Field>
+    <Field label="Assigned Manager"><input value={form.assigned_manager || ''} onChange={(e) => setField('assigned_manager', e.target.value)} /></Field>
+  </>
   return <>
     <Field label="Date"><input required type="date" value={form.start_date} onChange={(e) => setField('start_date', e.target.value)} /></Field>
     <Field label="Start Time"><input type="time" value={form.start_time || ''} onChange={(e) => setField('start_time', e.target.value)} /></Field>
@@ -177,5 +191,7 @@ function makeTitle(form) {
   if (form.type === 'Maintenance') return `Maintenance: ${form.extra_data.issue || 'Task'}`
   if (form.type === 'Staff Request Off') return `Staff Off: ${form.extra_data.requesterName || 'Staff Member'}`
   if (form.type === 'Manager Request Off') return `Manager Off: ${form.extra_data.requesterName || 'Manager'}`
+  if (form.type === 'Holiday') return form.extra_data.holidayName || 'Holiday'
+  if (form.type === 'Event / Special') return `Special: ${form.extra_data.specialName || 'Event'}`
   return form.type
 }
