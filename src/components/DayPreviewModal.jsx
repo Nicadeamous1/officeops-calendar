@@ -36,7 +36,7 @@ export default function DayPreviewModal({ date, events, onClose, onAddEvent, onE
                   <EventDetails event={event} />
                   {event.notes && <p className="event-notes">{event.notes}</p>}
                 </div>
-                {!readOnly && <button type="button" className="button secondary" onClick={() => onEditEvent(event)}>Edit</button>}
+                {!readOnly && !event.generated && <button type="button" className="button secondary" onClick={() => onEditEvent(event)}>Edit</button>}
               </article>
             ))}
           </div>

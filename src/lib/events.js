@@ -104,3 +104,56 @@ export function addDaysIso(value, days) {
   date.setDate(date.getDate() + days)
   return date.toLocaleDateString('en-CA')
 }
+
+export function getUsHolidays(startYear = new Date().getFullYear() - 1, endYear = new Date().getFullYear() + 2) {
+  const holidays = []
+  for (let year = startYear; year <= endYear; year += 1) {
+    holidays.push(
+      fixedHoliday(year, 0, 1, "New Year's Day"),
+      fixedHoliday(year, 5, 19, 'Juneteenth'),
+      fixedHoliday(year, 6, 4, 'Independence Day'),
+      fixedHoliday(year, 10, 11, 'Veterans Day'),
+      fixedHoliday(year, 11, 25, 'Christmas Day'),
+      weekdayHoliday(year, 0, 1, 3, 'Martin Luther King Jr. Day'),
+      weekdayHoliday(year, 1, 1, 3, "Presidents' Day"),
+      lastWeekdayHoliday(year, 4, 1, 'Memorial Day'),
+      weekdayHoliday(year, 8, 1, 1, 'Labor Day'),
+      weekdayHoliday(year, 9, 1, 2, 'Columbus Day'),
+      weekdayHoliday(year, 10, 4, 4, 'Thanksgiving Day'),
+    )
+  }
+  return holidays
+}
+
+function fixedHoliday(year, month, day, title) {
+  return makeHoliday(new Date(year, month, day, 12), title)
+}
+
+function weekdayHoliday(year, month, weekday, occurrence, title) {
+  const date = new Date(year, month, 1, 12)
+  date.setDate(1 + ((weekday - date.getDay() + 7) % 7) + ((occurrence - 1) * 7))
+  return makeHoliday(date, title)
+}
+
+function lastWeekdayHoliday(year, month, weekday, title) {
+  const date = new Date(year, month + 1, 0, 12)
+  date.setDate(date.getDate() - ((date.getDay() - weekday + 7) % 7))
+  return makeHoliday(date, title)
+}
+
+function makeHoliday(date, title) {
+  const startDate = date.toLocaleDateString('en-CA')
+  return {
+    id: `us-holiday-${startDate}-${title}`,
+    type: 'Holiday',
+    title,
+    start_date: startDate,
+    start_time: null,
+    end_time: null,
+    status: 'Observed',
+    assigned_manager: null,
+    notes: '',
+    extra_data: { holidayName: title, hours: 'Federal holiday' },
+    generated: true,
+  }
+}

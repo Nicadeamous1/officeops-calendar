@@ -7,7 +7,7 @@ import FilterBar from '../components/FilterBar'
 import OpenVipsModal from '../components/OpenVipsModal'
 import WeekPreviewModal from '../components/WeekPreviewModal'
 import { useEvents } from '../hooks/useEvents'
-import { eventOccursOnDate, todayIso } from '../lib/events'
+import { eventOccursOnDate, getUsHolidays, todayIso } from '../lib/events'
 
 export default function AdminPage() {
   const { events, loading, error, saveEvent, deleteEvent } = useEvents()
@@ -21,10 +21,11 @@ export default function AdminPage() {
   const [defaultDate, setDefaultDate] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
 
-  const filteredEvents = useMemo(() => events.filter((event) => {
+  const allEvents = useMemo(() => showHolidays ? [...events, ...getUsHolidays()] : events, [events, showHolidays])
+  const filteredEvents = useMemo(() => allEvents.filter((event) => {
     const typeMatches = typeFilter === 'All' || (typeFilter === 'Completed' ? ['Completed', 'Closed'].includes(event.status) : event.type === typeFilter)
-    return typeMatches && (statusFilter === 'All' || event.status === statusFilter) && (showHolidays || event.type !== 'Holiday')
-  }), [events, typeFilter, statusFilter, showHolidays])
+    return typeMatches && (statusFilter === 'All' || event.status === statusFilter)
+  }), [allEvents, typeFilter, statusFilter, showHolidays])
 
   const openNew = (date = '') => {
     setEditing(null)
@@ -65,7 +66,12 @@ export default function AdminPage() {
           onClose={() => setPreviewDate('')}
           onAddEvent={openNew}
           onPrintWeek={(date) => { setPreviewDate(''); setWeekPreviewDate(date) }}
-          onEditEvent={(event) => { setEditing(event); setPreviewDate(''); setModalOpen(true) }}
+          onEditEvent={(event) => {
+            if (event.generated) return
+            setEditing(event)
+            setPreviewDate('')
+            setModalOpen(true)
+          }}
         />
       )}
       {openVipsVisible && (

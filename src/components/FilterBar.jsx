@@ -32,7 +32,7 @@ export default function FilterBar({ typeFilter, setTypeFilter, statusFilter, set
       )}
       {setShowHolidays && (
         <label className="toggle-label">
-          Holidays
+          National Holidays
           <span className="toggle-row">
             <input type="checkbox" checked={showHolidays} onChange={(event) => setShowHolidays(event.target.checked)} />
             <span>{showHolidays ? 'Shown' : 'Hidden'}</span>

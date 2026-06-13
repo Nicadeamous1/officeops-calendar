@@ -4,7 +4,7 @@ import CalendarBoard from '../components/CalendarBoard'
 import DayPreviewModal from '../components/DayPreviewModal'
 import FilterBar from '../components/FilterBar'
 import { useEvents } from '../hooks/useEvents'
-import { endOfWeekIso, eventOccursOnDate, eventOverlapsRange, startOfWeekIso, todayIso } from '../lib/events'
+import { endOfWeekIso, eventOccursOnDate, eventOverlapsRange, getUsHolidays, startOfWeekIso, todayIso } from '../lib/events'
 
 export default function DisplayPage() {
   const { events, loading, error } = useEvents(30000)
@@ -18,16 +18,17 @@ export default function DisplayPage() {
     return () => window.clearInterval(timer)
   }, [])
 
-  const filteredEvents = useMemo(() => events.filter((event) => {
+  const allEvents = useMemo(() => showHolidays ? [...events, ...getUsHolidays()] : events, [events, showHolidays])
+  const filteredEvents = useMemo(() => allEvents.filter((event) => {
     const typeMatches = typeFilter === 'All' || (typeFilter === 'Completed' ? ['Completed', 'Closed'].includes(event.status) : event.type === typeFilter)
-    return typeMatches && (showHolidays || event.type !== 'Holiday')
-  }), [events, typeFilter, showHolidays])
-  const weekEvents = events.filter((event) => eventOverlapsRange(event, startOfWeekIso(), endOfWeekIso()))
+    return typeMatches
+  }), [allEvents, typeFilter, showHolidays])
+  const weekEvents = allEvents.filter((event) => eventOverlapsRange(event, startOfWeekIso(), endOfWeekIso()))
   const previewEvents = useMemo(() => filteredEvents
     .filter((event) => eventOccursOnDate(event, previewDate))
     .sort((a, b) => (a.start_time || '').localeCompare(b.start_time || '')), [filteredEvents, previewDate])
   const summaries = [
-    ['Today’s Items', events.filter((event) => eventOccursOnDate(event, todayIso())).length],
+    ['Today’s Items', allEvents.filter((event) => eventOccursOnDate(event, todayIso())).length],
     ['Open VIPs', events.filter((event) => event.type === 'VIP Replacement' && !['Closed', 'Replaced'].includes(event.status)).length],
     ['Orientations This Week', weekEvents.filter((event) => event.type === 'Orientation').length],
     ['Truck Orders This Week', weekEvents.filter((event) => event.type === 'Truck Order').length],
