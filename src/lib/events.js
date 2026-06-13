@@ -23,7 +23,7 @@ export const STATUS_OPTIONS = {
   'VIP Replacement': ['Open', 'Contacted', 'Replaced', 'Closed'],
   Interview: ['Scheduled', 'Completed', 'Cancelled'],
   Catering: ['Scheduled', 'Confirmed', 'Completed'],
-  Maintenance: ['Scheduled', 'In Progress', 'Completed'],
+  Maintenance: ['Scheduled', 'In Progress', 'Waiting on Parts', 'Completed'],
 }
 
 export function colorForEvent(event) {

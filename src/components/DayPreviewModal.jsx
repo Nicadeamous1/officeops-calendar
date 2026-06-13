@@ -63,7 +63,7 @@ function EventDetails({ event }) {
         <Detail label="Contact Info" value={extra.contactInfo} />
         <Detail label="Original Issue" value={extra.originalIssue} wide />
         <Detail label="Replacement Item" value={extra.replacementItem} wide />
-        <Detail label="Due Date" value={formatDate(event.start_date)} />
+        <Detail label="Incident Date" value={formatDate(event.start_date)} />
         <Detail label="VIP Status" value={extra.vipStatus || event.status} />
       </dl>
     )
@@ -89,6 +89,18 @@ function EventDetails({ event }) {
         <Detail label="Invoice Checked" value={yesNo(extra.invoiceChecked)} />
         <Detail label="Truck Put Away" value={yesNo(extra.truckPutAway)} />
         <Detail label="Truck Status" value={extra.truckStatus || event.status} />
+      </dl>
+    )
+  }
+
+  if (event.type === 'Maintenance') {
+    return (
+      <dl className="event-detail-grid">
+        <Detail label="Issue / Equipment" value={extra.issue} wide />
+        <Detail label="Location" value={extra.location} />
+        <Detail label="Priority" value={extra.priority} />
+        <Detail label="Service Vendor" value={extra.serviceVendor} />
+        <Detail label="Work Order Number" value={extra.workOrderNumber} />
       </dl>
     )
   }

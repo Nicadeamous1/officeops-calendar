@@ -114,7 +114,24 @@ function TypeFields({ form, setField, setExtra }) {
     <Field label="Contact Info"><input value={extra.contactInfo || ''} onChange={(e) => setExtra('contactInfo', e.target.value)} /></Field>
     <Field label="Original Issue" wide><input value={extra.originalIssue || ''} onChange={(e) => setExtra('originalIssue', e.target.value)} /></Field>
     <Field label="Replacement Item"><input value={extra.replacementItem || ''} onChange={(e) => setExtra('replacementItem', e.target.value)} /></Field>
-    <Field label="Due Date"><input required type="date" value={form.start_date} onChange={(e) => setField('start_date', e.target.value)} /></Field>
+    <Field label="Incident Date"><input required type="date" value={form.start_date} onChange={(e) => setField('start_date', e.target.value)} /></Field>
+    <Field label="Assigned Manager"><input value={form.assigned_manager || ''} onChange={(e) => setField('assigned_manager', e.target.value)} /></Field>
+  </>
+  if (form.type === 'Maintenance') return <>
+    <Field label="Issue / Equipment"><input required value={extra.issue || ''} onChange={(e) => setExtra('issue', e.target.value)} placeholder="Walk-in cooler, fryer, plumbing..." /></Field>
+    <Field label="Location"><input value={extra.location || ''} onChange={(e) => setExtra('location', e.target.value)} placeholder="Kitchen, dining room, office..." /></Field>
+    <Field label="Maintenance Date"><input required type="date" value={form.start_date} onChange={(e) => setField('start_date', e.target.value)} /></Field>
+    <Field label="Start Time"><input type="time" value={form.start_time || ''} onChange={(e) => setField('start_time', e.target.value)} /></Field>
+    <Field label="Priority">
+      <select value={extra.priority || 'Normal'} onChange={(e) => setExtra('priority', e.target.value)}>
+        <option>Low</option>
+        <option>Normal</option>
+        <option>High</option>
+        <option>Emergency</option>
+      </select>
+    </Field>
+    <Field label="Service Vendor"><input value={extra.serviceVendor || ''} onChange={(e) => setExtra('serviceVendor', e.target.value)} /></Field>
+    <Field label="Work Order Number"><input value={extra.workOrderNumber || ''} onChange={(e) => setExtra('workOrderNumber', e.target.value)} /></Field>
     <Field label="Assigned Manager"><input value={form.assigned_manager || ''} onChange={(e) => setField('assigned_manager', e.target.value)} /></Field>
   </>
   return <>
@@ -143,5 +160,6 @@ function makeTitle(form) {
   if (form.type === 'Orientation') return `Orientation: ${form.extra_data.employeeName || 'New Employee'}`
   if (form.type === 'Truck Order') return `Truck: ${form.extra_data.vendor || 'Vendor'}`
   if (form.type === 'VIP Replacement') return `VIP: ${form.extra_data.guestName || 'Guest'}`
+  if (form.type === 'Maintenance') return `Maintenance: ${form.extra_data.issue || 'Task'}`
   return form.type
 }

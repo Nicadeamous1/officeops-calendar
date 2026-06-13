@@ -88,6 +88,8 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .event-detail-grid dt { color: var(--muted); font-size: .7rem; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
 .event-detail-grid dd { margin: 3px 0 0; color: #fff; font-weight: 700; white-space: pre-wrap; }
 .week-preview-modal { max-width: 980px; }
+.open-vips-modal { max-width: 1050px; }
+.vip-list-content { flex: 1; min-width: 0; }
 .print-header { border-bottom: 2px solid var(--line); margin-bottom: 14px; padding-bottom: 12px; }
 .print-header p, .print-header span { color: var(--muted); font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: .08em; }
 .print-header h1 { margin: 4px 0; }

@@ -4,6 +4,7 @@ import CalendarBoard from '../components/CalendarBoard'
 import DayPreviewModal from '../components/DayPreviewModal'
 import EventModal from '../components/EventModal'
 import FilterBar from '../components/FilterBar'
+import OpenVipsModal from '../components/OpenVipsModal'
 import WeekPreviewModal from '../components/WeekPreviewModal'
 import { useEvents } from '../hooks/useEvents'
 import { todayIso } from '../lib/events'
@@ -14,6 +15,7 @@ export default function AdminPage() {
   const [statusFilter, setStatusFilter] = useState('All')
   const [editing, setEditing] = useState(null)
   const [previewDate, setPreviewDate] = useState('')
+  const [openVipsVisible, setOpenVipsVisible] = useState(false)
   const [weekPreviewDate, setWeekPreviewDate] = useState('')
   const [defaultDate, setDefaultDate] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
@@ -38,6 +40,7 @@ export default function AdminPage() {
   return (
     <main className="admin-page">
       <AppHeader mode="admin">
+        <button className="button secondary" onClick={() => setOpenVipsVisible(true)}>Open VIPs</button>
         <button className="button secondary" onClick={() => setWeekPreviewDate(previewDate || todayIso())}>Print Week</button>
         <button className="button primary" onClick={() => openNew()}>+ Add Event</button>
       </AppHeader>
@@ -62,6 +65,13 @@ export default function AdminPage() {
           onAddEvent={openNew}
           onPrintWeek={(date) => { setPreviewDate(''); setWeekPreviewDate(date) }}
           onEditEvent={(event) => { setEditing(event); setPreviewDate(''); setModalOpen(true) }}
+        />
+      )}
+      {openVipsVisible && (
+        <OpenVipsModal
+          events={events}
+          onClose={() => setOpenVipsVisible(false)}
+          onEditEvent={(event) => { setEditing(event); setOpenVipsVisible(false); setModalOpen(true) }}
         />
       )}
       {weekPreviewDate && <WeekPreviewModal date={weekPreviewDate} events={filteredEvents} onClose={() => setWeekPreviewDate('')} />}

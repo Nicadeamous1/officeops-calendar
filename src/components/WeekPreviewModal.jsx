@@ -68,7 +68,10 @@ function PrintDetails({ event }) {
     return <p>{[extra.vendor, extra.deliveryWindow, extra.orderPlaced && 'Order placed', extra.invoiceChecked && 'Invoice checked', extra.truckPutAway && 'Put away'].filter(Boolean).join(' | ')}</p>
   }
   if (event.type === 'VIP Replacement') {
-    return <p>{[extra.guestName, extra.replacementItem, extra.contactInfo].filter(Boolean).join(' | ')}</p>
+    return <p>{[`Incident: ${formatLongDate(event.start_date)}`, extra.guestName, extra.replacementItem, extra.contactInfo].filter(Boolean).join(' | ')}</p>
+  }
+  if (event.type === 'Maintenance') {
+    return <p>{[extra.issue, extra.location, extra.priority && `Priority: ${extra.priority}`, extra.serviceVendor, extra.workOrderNumber && `WO: ${extra.workOrderNumber}`].filter(Boolean).join(' | ')}</p>
   }
   return null
 }
