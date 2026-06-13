@@ -40,6 +40,7 @@ label { display: flex; flex-direction: column; gap: 5px; color: var(--muted); fo
 input, select, textarea { width: 100%; border: 1px solid var(--line); border-radius: 7px; padding: 9px 10px; background: #290e21; color: #fff; outline: none; }
 input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 2px rgba(255, 105, 180, .12); }
 .result-count { color: var(--muted); font-size: .85rem; }
+.toolbar-results { display: flex; align-items: center; gap: 12px; }
 .calendar-shell { border: 1px solid #a9497c; border-radius: 14px; padding: 14px; background: linear-gradient(145deg, #351229, #210d1d); overflow: hidden; box-shadow: 0 12px 40px rgba(151, 25, 94, .22); }
 .fc { --fc-border-color: #713252; --fc-page-bg-color: #301025; --fc-neutral-bg-color: #481733; --fc-list-event-hover-bg-color: #5a1d40; --fc-today-bg-color: rgba(255,105,180,.22); }
 .fc .fc-button-primary { background: #6e2050; border-color: #a9497c; font-weight: 700; }
@@ -93,6 +94,18 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .week-preview-modal { max-width: 980px; }
 .open-vips-modal { max-width: 1050px; }
 .vip-list-content { flex: 1; min-width: 0; }
+.request-report-modal { max-width: 1050px; }
+.report-search { margin-bottom: 16px; }
+.request-report-list { display: grid; gap: 16px; }
+.request-report-employee { border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: rgba(255, 119, 189, .06); }
+.request-report-employee > header { display: flex; justify-content: space-between; gap: 12px; padding: 12px 14px; background: rgba(255, 119, 189, .14); }
+.request-report-employee h3 { margin: 0; }
+.request-report-employee > header strong { color: var(--accent); }
+.request-report-rows { display: grid; gap: 1px; background: var(--line); }
+.request-report-rows article { position: relative; padding: 12px 110px 12px 14px; background: var(--panel); }
+.request-report-rows article > div { display: flex; flex-wrap: wrap; gap: 10px; color: var(--muted); }
+.request-report-rows article p { margin: 6px 0 0; }
+.request-report-rows article .button { position: absolute; top: 12px; right: 12px; }
 .print-header { border-bottom: 2px solid var(--line); margin-bottom: 14px; padding-bottom: 12px; }
 .print-header p, .print-header span { color: var(--muted); font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: .08em; }
 .print-header h1 { margin: 4px 0; }

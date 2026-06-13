@@ -5,6 +5,7 @@ import DayPreviewModal from '../components/DayPreviewModal'
 import EventModal from '../components/EventModal'
 import FilterBar from '../components/FilterBar'
 import OpenVipsModal from '../components/OpenVipsModal'
+import StaffRequestReportModal from '../components/StaffRequestReportModal'
 import WeekPreviewModal from '../components/WeekPreviewModal'
 import { useEvents } from '../hooks/useEvents'
 import { eventOccursOnDate, getUsHolidays, todayIso } from '../lib/events'
@@ -17,6 +18,7 @@ export default function AdminPage() {
   const [editing, setEditing] = useState(null)
   const [previewDate, setPreviewDate] = useState('')
   const [openVipsVisible, setOpenVipsVisible] = useState(false)
+  const [staffReportVisible, setStaffReportVisible] = useState(false)
   const [weekPreviewDate, setWeekPreviewDate] = useState('')
   const [defaultDate, setDefaultDate] = useState('')
   const [modalOpen, setModalOpen] = useState(false)
@@ -48,7 +50,10 @@ export default function AdminPage() {
       </AppHeader>
       <section className="toolbar-card">
         <FilterBar {...{ typeFilter, setTypeFilter, statusFilter, setStatusFilter, showHolidays, setShowHolidays }} />
-        <span className="result-count">{filteredEvents.length} events shown</span>
+        <div className="toolbar-results">
+          {typeFilter === 'Staff Request Off' && <button className="button secondary" onClick={() => setStaffReportVisible(true)}>Staff Request Report</button>}
+          <span className="result-count">{filteredEvents.length} events shown</span>
+        </div>
       </section>
       {error && <p className="error-message">{error}</p>}
       {loading ? <div className="center-message">Loading calendar...</div> : (
@@ -79,6 +84,13 @@ export default function AdminPage() {
           events={events}
           onClose={() => setOpenVipsVisible(false)}
           onEditEvent={(event) => { setEditing(event); setOpenVipsVisible(false); setModalOpen(true) }}
+        />
+      )}
+      {staffReportVisible && (
+        <StaffRequestReportModal
+          events={events}
+          onClose={() => setStaffReportVisible(false)}
+          onEditEvent={(event) => { setEditing(event); setStaffReportVisible(false); setModalOpen(true) }}
         />
       )}
       {weekPreviewDate && <WeekPreviewModal date={weekPreviewDate} events={filteredEvents} onClose={() => setWeekPreviewDate('')} />}
