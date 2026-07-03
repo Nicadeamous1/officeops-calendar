@@ -14,6 +14,7 @@ const DAY_NAMES = [
 export default function ScheduleImportModal({ onClose, onSaveEvents }) {
   const [imageName, setImageName] = useState('')
   const [imagePreview, setImagePreview] = useState('')
+  const [selectedFile, setSelectedFile] = useState(null)
   const [scheduleDate, setScheduleDate] = useState(todayIso())
   const [weekStart, setWeekStart] = useState(startOfWeekForDateIso(todayIso()))
   const [rawText, setRawText] = useState('')
@@ -26,30 +27,39 @@ export default function ScheduleImportModal({ onClose, onSaveEvents }) {
 
   const handleFile = async (file) => {
     if (!file) return
+    setSelectedFile(file)
     setImageName(file.name)
     setImagePreview(URL.createObjectURL(file))
     setMessage('Image loaded. Click Scan Photo to read it, or paste schedule text below.')
   }
 
   const scanPhoto = async () => {
-    const fileInput = document.getElementById('schedule-photo-input')
-    const file = fileInput?.files?.[0]
-    if (!file) {
+    if (!selectedFile) {
       setMessage('Choose or drop a schedule photo first.')
       return
     }
 
     setBusy(true)
-    setMessage('Scanning photo. This can take a minute the first time.')
+    setMessage('Loading scanner. This can take a minute the first time.')
     try {
-      const { createWorker } = await import(/* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.esm.min.js')
-      const worker = await createWorker('eng')
-      const result = await worker.recognize(file)
-      await worker.terminate()
+      const Tesseract = await loadTesseract()
+      setMessage('Scanning photo. Keep this window open.')
+      const result = await Tesseract.recognize(selectedFile, 'eng', {
+        workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
+        corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core-simd.wasm.js',
+        langPath: 'https://tessdata.projectnaptha.com/4.0.0',
+        logger: (progress) => {
+          if (progress.status) {
+            const percent = progress.progress ? ` ${Math.round(progress.progress * 100)}%` : ''
+            setMessage(`Scanning photo: ${progress.status}${percent}`)
+          }
+        },
+      })
       const text = result.data.text || ''
       setRawText(text)
-      setEntries(parseScheduleText(text, scheduleDate, weekStart))
-      setMessage('Photo scanned. Review the entries before saving.')
+      const parsed = parseScheduleText(text, scheduleDate, weekStart)
+      setEntries(parsed)
+      setMessage(parsed.length ? `Photo scanned. ${parsed.length} shift entries found. Review before saving.` : 'Photo scanned, but no shifts were recognized. You can edit the extracted text below and click Preview Text.')
     } catch (error) {
       setMessage(`Could not scan automatically: ${error.message}. You can paste the schedule text and preview it instead.`)
     } finally {
@@ -135,6 +145,27 @@ export default function ScheduleImportModal({ onClose, onSaveEvents }) {
       </section>
     </div>
   )
+}
+
+function loadTesseract() {
+  if (window.Tesseract) return Promise.resolve(window.Tesseract)
+
+  return new Promise((resolve, reject) => {
+    const existing = document.querySelector('script[data-tesseract-loader="true"]')
+    if (existing) {
+      existing.addEventListener('load', () => resolve(window.Tesseract))
+      existing.addEventListener('error', () => reject(new Error('Scanner script could not load.')))
+      return
+    }
+
+    const script = document.createElement('script')
+    script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'
+    script.async = true
+    script.dataset.tesseractLoader = 'true'
+    script.onload = () => window.Tesseract ? resolve(window.Tesseract) : reject(new Error('Scanner loaded but did not start.'))
+    script.onerror = () => reject(new Error('Scanner script could not load. Check internet access and try again.'))
+    document.head.appendChild(script)
+  })
 }
 
 function parseScheduleText(text, defaultDate, weekStart) {
