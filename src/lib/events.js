@@ -9,6 +9,7 @@ export const EVENT_TYPES = [
   'Manager Request Off',
   'Holiday',
   'Event / Special',
+  'Staff Schedule',
 ]
 
 export const TYPE_COLORS = {
@@ -22,6 +23,7 @@ export const TYPE_COLORS = {
   'Manager Request Off': '#f472b6',
   Holiday: '#06b6d4',
   'Event / Special': '#84cc16',
+  'Staff Schedule': '#14b8a6',
   Completed: '#64748b',
 }
 
@@ -36,6 +38,7 @@ export const STATUS_OPTIONS = {
   'Manager Request Off': ['Requested', 'Approved', 'Denied', 'Cancelled'],
   Holiday: ['Observed', 'Open', 'Closed'],
   'Event / Special': ['Planned', 'Confirmed', 'Completed', 'Cancelled'],
+  'Staff Schedule': ['Scheduled', 'Called Off', 'Completed'],
 }
 
 export function colorForEvent(event) {
@@ -123,6 +126,42 @@ export function getUsHolidays(startYear = new Date().getFullYear() - 1, endYear 
     )
   }
   return holidays
+}
+
+export function getRecurringOrderReminders(startYear = new Date().getFullYear() - 1, endYear = new Date().getFullYear() + 2) {
+  const reminders = []
+  const start = new Date(startYear, 0, 1, 12)
+  const end = new Date(endYear, 11, 31, 12)
+
+  for (const date = new Date(start); date <= end; date.setDate(date.getDate() + 1)) {
+    const day = date.getDay()
+    const startDate = date.toLocaleDateString('en-CA')
+
+    if (day === 2 || day === 5) {
+      reminders.push(makeReminder(startDate, 'Truck order due by 11', '11:00'))
+    }
+    if (day === 0 || day === 2 || day === 5) {
+      reminders.push(makeReminder(startDate, 'Produce order due'))
+    }
+  }
+
+  return reminders
+}
+
+function makeReminder(startDate, title, startTime = null) {
+  return {
+    id: `recurring-order-${startDate}-${title}`,
+    type: 'Truck Order',
+    title,
+    start_date: startDate,
+    start_time: startTime,
+    end_time: null,
+    status: 'Ordered',
+    assigned_manager: null,
+    notes: 'Automatic recurring order reminder.',
+    extra_data: { vendor: title.startsWith('Produce') ? 'Produce' : 'Truck Order', recurringReminder: true },
+    generated: true,
+  }
 }
 
 function fixedHoliday(year, month, day, title) {

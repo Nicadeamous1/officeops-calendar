@@ -162,6 +162,12 @@ function TypeFields({ form, setField, setExtra }) {
     <Field label="Expected Volume"><input value={extra.expectedVolume || ''} onChange={(e) => setExtra('expectedVolume', e.target.value)} placeholder="Low, high, 150 guests..." /></Field>
     <Field label="Assigned Manager"><input value={form.assigned_manager || ''} onChange={(e) => setField('assigned_manager', e.target.value)} /></Field>
   </>
+  if (form.type === 'Staff Schedule') return <>
+    <Field label="Employee Name"><input required value={extra.employeeName || ''} onChange={(e) => setExtra('employeeName', e.target.value)} /></Field>
+    <Field label="Role / Station"><input value={extra.role || ''} onChange={(e) => setExtra('role', e.target.value)} /></Field>
+    <DateTimeFields form={form} setField={setField} dateLabel="Shift Date" />
+    <Field label="End Time"><input type="time" value={form.end_time || ''} onChange={(e) => setField('end_time', e.target.value)} /></Field>
+  </>
   return <>
     <Field label="Date"><input required type="date" value={form.start_date} onChange={(e) => setField('start_date', e.target.value)} /></Field>
     <Field label="Start Time"><input type="time" value={form.start_time || ''} onChange={(e) => setField('start_time', e.target.value)} /></Field>
@@ -193,5 +199,6 @@ function makeTitle(form) {
   if (form.type === 'Manager Request Off') return `Manager Off: ${form.extra_data.requesterName || 'Manager'}`
   if (form.type === 'Holiday') return form.extra_data.holidayName || 'Holiday'
   if (form.type === 'Event / Special') return `Special: ${form.extra_data.specialName || 'Event'}`
+  if (form.type === 'Staff Schedule') return `${form.extra_data.employeeName || 'Shift'}: Staff Schedule`
   return form.type
 }

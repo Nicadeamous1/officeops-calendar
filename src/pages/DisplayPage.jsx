@@ -4,12 +4,13 @@ import CalendarBoard from '../components/CalendarBoard'
 import DayPreviewModal from '../components/DayPreviewModal'
 import FilterBar from '../components/FilterBar'
 import { useEvents } from '../hooks/useEvents'
-import { endOfWeekIso, eventOccursOnDate, eventOverlapsRange, getUsHolidays, startOfWeekIso, todayIso } from '../lib/events'
+import { endOfWeekIso, eventOccursOnDate, eventOverlapsRange, getRecurringOrderReminders, getUsHolidays, startOfWeekIso, todayIso } from '../lib/events'
 
 export default function DisplayPage() {
   const { events, loading, error } = useEvents(30000)
-  const [typeFilter, setTypeFilter] = useState('All')
+  const [typeFilter, setTypeFilter] = useState(['All'])
   const [showHolidays, setShowHolidays] = useState(true)
+  const [showOrderReminders, setShowOrderReminders] = useState(true)
   const [previewDate, setPreviewDate] = useState('')
   const [now, setNow] = useState(new Date())
 
@@ -18,9 +19,14 @@ export default function DisplayPage() {
     return () => window.clearInterval(timer)
   }, [])
 
-  const allEvents = useMemo(() => showHolidays ? [...events, ...getUsHolidays()] : events, [events, showHolidays])
+  const allEvents = useMemo(() => [
+    ...events,
+    ...(showHolidays ? getUsHolidays() : []),
+    ...(showOrderReminders ? getRecurringOrderReminders() : []),
+  ], [events, showHolidays, showOrderReminders])
   const filteredEvents = useMemo(() => allEvents.filter((event) => {
-    const typeMatches = typeFilter === 'All' || (typeFilter === 'Completed' ? ['Completed', 'Closed'].includes(event.status) : event.type === typeFilter)
+    const selectedTypes = Array.isArray(typeFilter) && typeFilter.length ? typeFilter : ['All']
+    const typeMatches = selectedTypes.includes('All') || selectedTypes.some((type) => type === 'Completed' ? ['Completed', 'Closed'].includes(event.status) : event.type === type)
     return typeMatches
   }), [allEvents, typeFilter, showHolidays])
   const weekEvents = allEvents.filter((event) => eventOverlapsRange(event, startOfWeekIso(), endOfWeekIso()))
@@ -39,7 +45,7 @@ export default function DisplayPage() {
       <AppHeader mode="display">
         <div className="clock"><strong>{now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</strong><span>{now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}</span></div>
       </AppHeader>
-      <section className="display-filter"><FilterBar typeFilter={typeFilter} setTypeFilter={setTypeFilter} showStatus={false} showHolidays={showHolidays} setShowHolidays={setShowHolidays} /></section>
+      <section className="display-filter"><FilterBar typeFilter={typeFilter} setTypeFilter={setTypeFilter} showStatus={false} showHolidays={showHolidays} setShowHolidays={setShowHolidays} showOrderReminders={showOrderReminders} setShowOrderReminders={setShowOrderReminders} /></section>
       {error && <p className="error-message">{error}</p>}
       {loading ? <div className="center-message">Loading operations board...</div> : (
         <CalendarBoard

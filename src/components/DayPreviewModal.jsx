@@ -132,6 +132,16 @@ function EventDetails({ event }) {
     )
   }
 
+  if (event.type === 'Staff Schedule') {
+    return (
+      <dl className="event-detail-grid">
+        <Detail label="Employee" value={extra.employeeName} />
+        <Detail label="Role / Station" value={extra.role} />
+        <Detail label="End Time" value={formatTime(event.end_time)} />
+      </dl>
+    )
+  }
+
   return null
 }
 

@@ -82,6 +82,9 @@ function PrintDetails({ event }) {
   if (event.type === 'Event / Special') {
     return <p>{[extra.specialName, extra.promotion, extra.expectedVolume && `Expected: ${extra.expectedVolume}`].filter(Boolean).join(' | ')}</p>
   }
+  if (event.type === 'Staff Schedule') {
+    return <p>{[extra.employeeName, extra.role, event.end_time && `Ends: ${formatTime(event.end_time)}`].filter(Boolean).join(' | ')}</p>
+  }
   return null
 }
 
