@@ -43,11 +43,11 @@ export default function ScheduleImportModal({ onClose, onSaveEvents }) {
     setMessage('Loading scanner. This can take a minute the first time.')
     try {
       const Tesseract = await loadTesseract()
+      if (typeof Tesseract.recognize !== 'function') {
+        throw new Error('Scanner library loaded incorrectly. Refresh the page and try again.')
+      }
       setMessage('Scanning photo. Keep this window open.')
       const result = await Tesseract.recognize(selectedFile, 'eng', {
-        workerPath: 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/worker.min.js',
-        corePath: 'https://cdn.jsdelivr.net/npm/tesseract.js-core@5/tesseract-core-simd.wasm.js',
-        langPath: 'https://tessdata.projectnaptha.com/4.0.0',
         logger: (progress) => {
           if (progress.status) {
             const percent = progress.progress ? ` ${Math.round(progress.progress * 100)}%` : ''
@@ -61,7 +61,7 @@ export default function ScheduleImportModal({ onClose, onSaveEvents }) {
       setEntries(parsed)
       setMessage(parsed.length ? `Photo scanned. ${parsed.length} shift entries found. Review before saving.` : 'Photo scanned, but no shifts were recognized. You can edit the extracted text below and click Preview Text.')
     } catch (error) {
-      setMessage(`Could not scan automatically: ${error.message}. You can paste the schedule text and preview it instead.`)
+      setMessage(`Could not scan automatically: ${error.message || error}. Try Ctrl+Shift+R, then scan again. You can also paste schedule text and preview it instead.`)
     } finally {
       setBusy(false)
     }
@@ -159,7 +159,7 @@ function loadTesseract() {
     }
 
     const script = document.createElement('script')
-    script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js'
+    script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js'
     script.async = true
     script.dataset.tesseractLoader = 'true'
     script.onload = () => window.Tesseract ? resolve(window.Tesseract) : reject(new Error('Scanner loaded but did not start.'))
