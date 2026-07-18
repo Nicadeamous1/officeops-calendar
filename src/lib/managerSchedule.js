@@ -17,6 +17,24 @@ export function parseShiftCell(rawValue, options = {}) {
   return [{ ...base, status: 'unreadable', startTime: '', endTime: '', confidence: 0.25 }]
 }
 
+export function normalizeOcrShiftText(rawValue) {
+  let value = String(rawValue ?? '').trim().replace(/[—–_]/g, '-').replace(/\s+/g, '')
+  if (!value) return ''
+  value = value.replace(/^ro$/i, 'R/O').replace(/^vac$/i, 'vac').replace(/^x$/i, 'x')
+  value = value.replace(/close$/i, 'cl').replace(/c[iI1]$/i, 'cl')
+  value = value.replace(/^(\d{1,2})(cl)$/i, '$1-$2')
+  value = value.replace(/^(\d{1,2})[\s.:]+(?=\d|cl)/i, '$1-')
+  value = value.replace(/^([0-9OlI]{1,2})([-/])([0-9OlI]{1,2}|cl)/i, (_, start, separator, end) =>
+    `${fixTimeDigits(start)}${separator}${/^cl$/i.test(end) ? 'cl' : fixTimeDigits(end)}`
+  )
+  value = value.replace(/\/+/g, '/')
+  return value
+}
+
+function fixTimeDigits(value) {
+  return value.replace(/[oO]/g, '0').replace(/[lI]/g, '1')
+}
+
 function parseRange(value, closingTime) {
   const match = value.match(/^(\d{1,2})(?::(\d{2}))?\s*-\s*(?:(\d{1,2})(?::(\d{2}))?|cl|close)$/i)
   if (!match) return null
@@ -41,13 +59,18 @@ function parseRange(value, closingTime) {
 
 export function textToRows(text) {
   return String(text || '').split(/\r?\n/).filter((line) => line.trim()).map((line) =>
-    line.includes('\t') ? line.split('\t') : line.trim().split(/\s{2,}/)
+    line.includes('\t') ? line.split('\t') : [line.trim()]
   )
 }
 
 export function parseManagerScheduleRows(rows, options = {}) {
   const records = []
   const warnings = []
+  const weeks = new Set()
+  let managerRowsDetected = 0
+  let hourlySeparatorsDetected = 0
+  let datedColumnsDetected = 0
+  let shiftCellsDetected = 0
   let weekLabel = ''
   let dayColumns = []
   let datesByColumn = {}
@@ -59,13 +82,15 @@ export function parseManagerScheduleRows(rows, options = {}) {
     const weekMatch = joined.match(/\bWEEK\s*([1-4])\b/i)
     if (weekMatch) {
       weekLabel = `Week ${weekMatch[1]}`
+      weeks.add(weekLabel)
       if (!dayColumns.length) dayColumns = []
       datesByColumn = {}
       managersOpen = dayColumns.length > 0
       return
     }
     if (!weekLabel) return
-    if (/\bHOURLY\b/i.test(joined)) {
+    if (row.some((cell) => /^HOURLY$/i.test(cell))) {
+      hourlySeparatorsDetected += 1
       managersOpen = false
       return
     }
@@ -83,6 +108,7 @@ export function parseManagerScheduleRows(rows, options = {}) {
       })
       if (Object.keys(found).length >= 5) {
         datesByColumn = found
+        datedColumnsDetected = Math.max(datedColumnsDetected, Object.keys(found).length)
         return
       }
     }
@@ -91,6 +117,7 @@ export function parseManagerScheduleRows(rows, options = {}) {
       if (dateColumns.length === 7) {
         dayColumns = dateColumns.map(({ index }, dayIndex) => ({ index, day: DAYS[dayIndex] }))
         datesByColumn = Object.fromEntries(dateColumns.map(({ index, date }) => [index, date]))
+        datedColumnsDetected = Math.max(datedColumnsDetected, dateColumns.length)
         managersOpen = true
         return
       }
@@ -98,9 +125,12 @@ export function parseManagerScheduleRows(rows, options = {}) {
     if (!managersOpen || !dayColumns.length) return
     const employeeName = row[0]
     if (!employeeName || /date|manager|employee|name/i.test(employeeName)) return
+    if (options.managers?.length && !options.managers.some((name) => name.toLowerCase() === employeeName.toLowerCase())) return
+    managerRowsDetected += 1
     dayColumns.forEach(({ index, day }) => {
       const date = datesByColumn[index]
       if (!date) return
+      if (row[index]) shiftCellsDetected += 1
       parseShiftCell(row[index], options).forEach((shift) => records.push({
         weekLabel, employeeName, date, dayOfWeek: day, ...shift,
         id: `${rowIndex}-${index}-${records.length}`,
@@ -108,9 +138,22 @@ export function parseManagerScheduleRows(rows, options = {}) {
     })
   })
 
-  if (!records.length) warnings.push('No manager grid was detected. Check the week, day, date, and HOURLY rows or correct the pasted table.')
+  const diagnostics = {
+    inputType: options.inputType || 'unknown',
+    rowsDetected: rows.length,
+    columnsDetected: rows.reduce((maximum, row) => Math.max(maximum, row.length), 0),
+    weeksDetected: weeks.size,
+    managerRowsDetected,
+    hourlySeparatorsDetected,
+    shiftCellsDetected,
+    workShiftsDetected: records.filter((record) => record.status === 'work').length,
+    ignoredCellsDetected: records.filter((record) => record.status !== 'work').length,
+    datedColumnsDetected,
+  }
+  const validGrid = weeks.size > 0 && datedColumnsDetected >= 5 && managerRowsDetected > 0 && hourlySeparatorsDetected > 0
+  if (!records.length) warnings.push('No manager grid was detected. Check the week, date, manager, and HOURLY rows or correct the pasted table.')
   if (weekLabel && !dayColumns.length) warnings.push(`${weekLabel}: Monday-Sunday headers were unclear.`)
-  return { records, warnings }
+  return { records, warnings, diagnostics, validGrid }
 }
 
 export function parseManagerScheduleText(text, options = {}) {
