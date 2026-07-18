@@ -132,6 +132,12 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); box-sha
 .schedule-preview-table th, .schedule-preview-table td { padding: 7px; border-bottom: 1px solid var(--line); }
 .schedule-preview-table tr.nonwork { opacity: .72; background: rgba(255,255,255,.03); }
 .schedule-preview-table input:not([type="checkbox"]), .schedule-preview-table select { min-width: 105px; width: 100%; padding: 6px; }
+.schedule-diagnostics { margin: 12px 0; border: 1px solid var(--line); border-radius: 10px; padding: 10px; }
+.schedule-diagnostics summary { cursor: pointer; font-weight: 800; }
+.schedule-diagnostics dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 8px; }
+.schedule-diagnostics dl div { background: rgba(255,255,255,.04); border-radius: 7px; padding: 8px; }
+.schedule-diagnostics dt { color: var(--muted); font-size: .75rem; }
+.schedule-diagnostics dd { margin: 2px 0 0; font-weight: 850; }
 .print-header { border-bottom: 2px solid var(--line); margin-bottom: 14px; padding-bottom: 12px; }
 .print-header p, .print-header span { color: var(--muted); font-weight: 800; margin: 0; text-transform: uppercase; letter-spacing: .08em; }
 .print-header h1 { margin: 4px 0; }

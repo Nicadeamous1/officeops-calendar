@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { describe, it } from 'node:test'
-import { parseManagerScheduleRows, parseShiftCell } from './managerSchedule.js'
+import { normalizeOcrShiftText, parseManagerScheduleRows, parseManagerScheduleText, parseShiftCell, textToRows } from './managerSchedule.js'
 
 describe('parseShiftCell', () => {
   for (const [raw, status, start, end, shouldImport] of [
@@ -22,6 +22,10 @@ describe('parseShiftCell', () => {
       { startTime: '17:00', endTime: '23:00', status: 'work' },
     ])
   })
+
+  for (const [raw, expected] of [
+    ['6—4', '6-4'], ['11 cI', '11-cl'], ['11-ci', '11-cl'], ['RO', 'R/O'], ['VAC', 'vac'], ['X', 'x'],
+  ]) it(`normalizes OCR text ${raw}`, () => assert.equal(normalizeOcrShiftText(raw), expected))
 })
 
 describe('parseManagerScheduleRows', () => {
@@ -44,6 +48,29 @@ describe('parseManagerScheduleRows', () => {
     assert.equal(result.records.filter((record) => record.status === 'work').length, 37)
     assert.equal(result.records.some((record) => record.employeeName === 'Hourly Person'), false)
     assert.equal(result.records.filter((record) => record.date === '2026-07-19' && record.employeeName === 'Kelly').length, 2)
+    assert.deepEqual(result.diagnostics, {
+      inputType: 'unknown', rowsDetected: 28, columnsDetected: 8, weeksDetected: 4,
+      managerRowsDetected: 8, hourlySeparatorsDetected: 4, shiftCellsDetected: 56,
+      workShiftsDetected: 37, ignoredCellsDetected: 21, datedColumnsDetected: 7,
+    })
+    assert.equal(result.validGrid, true)
+  })
+
+  it('preserves empty Excel cells in tab-delimited paste', () => {
+    const text = 'WEEK 1\t\t\t\t\t\t\t\n\t13-Jul\t14-Jul\t15-Jul\t16-Jul\t17-Jul\t18-Jul\t19-Jul\nKelly\t6-4\t\tx\t9-7\t7-5\t\t8-2/5-cl\nMike\t6-4\tx\tx\t6-4\t9-7\t9-7\t11-cl\nHOURLY\t\t\t\t\t\t\t'
+    assert.equal(textToRows(text)[2].length, 8)
+    assert.equal(textToRows(text)[2][2], '')
+    const result = parseManagerScheduleText(text, { year: 2026, inputType: 'paste', managers: ['Kelly', 'Mike'] })
+    assert.equal(result.validGrid, true)
+    assert.equal(result.diagnostics.columnsDetected, 8)
+    assert.equal(result.diagnostics.managerRowsDetected, 2)
+  })
+
+  it('rejects corrupted paragraph OCR as a manager grid', () => {
+    const result = parseManagerScheduleText('PWEEKL | 13| 4guJ random broken OCR', { inputType: 'image' })
+    assert.equal(result.validGrid, false)
+    assert.equal(result.records.length, 0)
+    assert.equal(result.diagnostics.weeksDetected, 0)
   })
 })
 
